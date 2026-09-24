@@ -84,7 +84,6 @@ agri_spray_ros2/
               Telemetry Time-Series Plots
 ```
 
----
 
 # Requirements
 
