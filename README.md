@@ -4,8 +4,6 @@ A ROS 2-based live telemetry visualizer and adaptive payload detector designed f
 
 The system consumes **1 Hz agricultural drone telemetry through native ROS 2 bag playback**, visualizes the drone trajectory and synchronized telemetry signals, and implements an **adaptive mass-balance tank-empty detector** designed to prevent false Return-to-Launch (RTL) decisions caused by temporary flow interruptions.
 
----
-
 ## Project Overview
 
 Agricultural spraying drones carry liquid payloads such as pesticides, herbicides, fungicides, or liquid fertilizers. Reliable estimation of remaining payload is important because an incorrect tank-empty decision can prematurely terminate a spraying mission.
@@ -27,8 +25,6 @@ The implementation provides:
 * Comparison between the Companion Computer decision and the corrected detector
 
 The detector operates using telemetry values rather than hard-coded timestamps or sample indices.
-
----
 
 # Project Architecture
 
@@ -98,18 +94,15 @@ agri_spray_ros2/
 
 Recommended:
 
-* Ubuntu 22.04 LTS
-* Ubuntu 24.04 LTS
+* Ubuntu 26.04 LTS
 
 ## ROS 2
 
 Supported distributions:
 
-* ROS 2 Humble
-* ROS 2 Iron
-* ROS 2 Jazzy
+* ROS 2 lyrical
 
-The example commands below use **ROS 2 Humble**.
+The example commands below use **ROS 2 lyrical**.
 
 ## Python
 
@@ -124,7 +117,6 @@ matplotlib
 
 The project also requires the Python packages provided by the ROS 2 installation.
 
----
 
 # 1. Environment Setup
 
@@ -136,7 +128,7 @@ If ROS 2 Humble is already installed, install the remaining dependencies:
 sudo apt update
 
 sudo apt install -y \
-    ros-humble-ros-base \
+    ros-lyrical-ros-base \
     python3-pip \
     python3-dev \
     python3-tk
@@ -145,10 +137,9 @@ sudo apt install -y \
 Source ROS 2:
 
 ```bash
-source /opt/ros/humble/setup.bash
+source /opt/ros/lyrical/setup.bash
 ```
 
----
 
 # 2. Python Virtual Environment
 
@@ -176,7 +167,6 @@ Install project dependencies:
 pip install -r requirements.txt
 ```
 
----
 
 # 3. ROS 2 Bag
 
@@ -211,7 +201,7 @@ Run:
 ```bash
 source /opt/ros/humble/setup.bash
 
-python3 generate_ros2_bag.py
+python3 main_ros2_writer.py your_telemetry_data.csv spray_mission_bag
 ```
 
 The generated bag can then be inspected:
@@ -229,7 +219,7 @@ Two terminals are recommended.
 ## Terminal 1 — Start the Visualizer
 
 ```bash
-source /opt/ros/humble/setup.bash
+source /opt/ros/lyrical/setup.bash
 source ros2_env/bin/activate
 
 python3 ros2_live_visualizer.py
@@ -242,7 +232,7 @@ The node subscribes to the telemetry stream and processes the incoming messages.
 ## Terminal 2 — Play the ROS 2 Bag
 
 ```bash
-source /opt/ros/humble/setup.bash
+source /opt/ros/lyrical/setup.bash
 
 ros2 bag play spray_mission_bag
 ```
@@ -251,7 +241,6 @@ The telemetry is replayed through ROS 2 rather than being read directly from the
 
 This is important because the visualization and detector operate on the same ROS 2 message stream that would be used during a live telemetry scenario.
 
----
 
 # Visualization
 
@@ -276,7 +265,6 @@ Y
 
 This allows the flight path and spraying sections to be observed spatially.
 
----
 
 ## 2. Telemetry Time-Series
 
@@ -293,7 +281,6 @@ Important signals include:
 
 This makes the false RTL event and the corrected detector response directly comparable.
 
----
 
 # Input Telemetry
 
@@ -330,7 +317,6 @@ This allows the estimator to handle occasional timing variations such as:
 1.2 s
 ```
 
----
 
 # Task 2 — Spurious Tank-Empty Detection
 
@@ -357,7 +343,6 @@ Therefore, an instantaneous low-flow test could not distinguish between:
 3. Pump/system fault
 4. Air ingestion or sloshing
 
----
 
 # Point 1 — Mechanism Behind the Spurious Tank-Empty Declaration
 
@@ -398,7 +383,6 @@ The key problem was the absence of sufficient:
 
 Consequently, a short flow interruption was interpreted as complete tank exhaustion.
 
----
 
 # Point 2 — Supporting Telemetry Samples
 
@@ -428,7 +412,6 @@ Relative to a 10 L initial payload:
 
 Thus, approximately **45% of the original payload remained** when the false tank-empty event occurred.
 
----
 
 # Point 3 — Corrected Detector Design
 
@@ -449,7 +432,6 @@ Low Flow = Empty Tank
 
 Instead, it evaluates the situation as a state transition.
 
----
 
 # 1. Mass-Balance State Estimator
 
@@ -492,7 +474,6 @@ V_initial
 ∫ FlowRate(t) / 60 dt
 ```
 
----
 
 # Dynamic Time Integration
 
@@ -521,7 +502,6 @@ This is important because the log may contain intervals such as:
 
 Using the actual timestamp difference prevents integration error caused by assuming a constant sample interval.
 
----
 
 # Refill Reset
 
@@ -594,7 +574,6 @@ the detector enters a low-flow evaluation state.
 
 It does not immediately declare the tank empty.
 
----
 
 # Adaptive Probe Logic
 
@@ -657,7 +636,6 @@ This distinction is important because a substantial estimated payload remaining 
 
 rather than an empty tank.
 
----
 
 # Case B — Payload Near Depletion
 
@@ -713,8 +691,8 @@ The conceptual state machine is:
                         ▼
                  PROBING_SLOSH
                     │       │
-          Flow       │       │ No recovery
-        recovers     │       ▼
+          Flow      │       │ No recovery
+        recovers    │       ▼
                     │   FAULT_CLOG_
                     │   OR_SYSTEM_ISSUE
                     ▼
@@ -732,7 +710,6 @@ The conceptual state machine is:
              DETECTOR_TANK_EMPTY
 ```
 
----
 
 # Why the 5-Second Slosh Probe?
 
@@ -762,7 +739,6 @@ Persistent flow failure
 
 The selected 5-second window is intended to tolerate temporary flow interruptions while still identifying persistent problems.
 
----
 
 # Why the 300 mL Threshold?
 
@@ -796,7 +772,6 @@ Near-empty payload condition
 
 It also avoids using the raw flow signal alone to determine whether the tank has been depleted.
 
----
 
 # Why the 2-Second Empty Confirmation?
 
@@ -828,7 +803,6 @@ is generated.
 
 This reduces sensitivity to one-sample sensor noise and protects the pump from continued operation after a confirmed depletion condition.
 
----
 
 # Detector Parameters
 
@@ -843,7 +817,6 @@ EMPTY_CONFIRM_WINDOW_SEC   = 2.0
 
 These values are explicitly defined rather than embedded as timestamp-specific conditions.
 
----
 
 # Log-Wide Evaluation
 
@@ -856,7 +829,6 @@ These values are explicitly defined rather than embedded as timestamp-specific c
 
 The corrected detector therefore distinguishes the temporary low-flow event from the later genuine depletion event based on telemetry-derived state rather than timestamp-specific logic.
 
----
 
 # False RTL Event
 
@@ -912,7 +884,6 @@ Return to nominal spraying
 No tank-empty RTL
 ```
 
----
 
 # Important Design Property
 
@@ -943,7 +914,6 @@ elapsed probe time
 
 This makes the detector applicable to different mission logs and live telemetry streams.
 
----
 
 # Handling Variable Sample Intervals
 
@@ -971,7 +941,6 @@ dt = 1.0
 
 This is particularly important for accurate payload integration.
 
----
 
 # Secondary Telemetry Anomalies
 
@@ -993,7 +962,6 @@ This is consistent with a pressure/build-up delay in the spraying system.
 
 Therefore, startup flow should not necessarily be interpreted as a tank-empty condition.
 
----
 
 ## 2. Heading Wrapping
 
@@ -1010,7 +978,6 @@ represents a small physical heading change rather than a ~358° rotation.
 
 A production trajectory-processing system should therefore normalize heading differences when calculating angular changes.
 
----
 
 ## 3. Variable Sample Timing
 
@@ -1029,7 +996,6 @@ but occasional intervals may be:
 
 The mass-balance estimator therefore uses the measured timestamp difference for every integration step.
 
----
 
 # Design Assumptions
 
@@ -1043,7 +1009,6 @@ Initial payload = 10,000 mL
 
 unless an explicit refill/reset event is detected.
 
----
 
 ## Tank Capacity
 
@@ -1055,7 +1020,6 @@ The nominal tank capacity used by the estimator is:
 
 This is consistent with the mission scenario.
 
----
 
 ## Flow Measurement
 
@@ -1071,8 +1035,6 @@ and converted to mL/s during integration:
 flow_ml_per_second = flow_ml_per_minute / 60
 ```
 
----
-
 ## Telemetry Rate
 
 The source telemetry is nominally:
@@ -1083,7 +1045,6 @@ The source telemetry is nominally:
 
 but the detector does not depend on a fixed sampling period.
 
----
 
 # Reproducibility
 
@@ -1097,7 +1058,7 @@ cd agri_spray_ros2
 Create the environment:
 
 ```bash
-source /opt/ros/humble/setup.bash
+source /opt/ros/lyrical/setup.bash
 
 python3 -m venv ros2_env --system-site-packages
 source ros2_env/bin/activate
@@ -1120,12 +1081,11 @@ python3 ros2_live_visualizer.py
 In another terminal:
 
 ```bash
-source /opt/ros/humble/setup.bash
+source /opt/ros/lyrical/setup.bash
 
 ros2 bag play spray_mission_bag
 ```
 
----
 
 # Verification Checklist
 
@@ -1146,8 +1106,6 @@ After starting the system, verify the following:
 * [ ] Flow recovery returns the detector to nominal state
 * [ ] The later genuine low-volume event is detected
 * [ ] `DETECTOR_TANK_EMPTY` is generated after confirmation
-
----
 
 # Key Technical Concepts Demonstrated
 
@@ -1171,7 +1129,6 @@ This project demonstrates practical concepts in:
 * Cartesian trajectory visualization
 * Handling irregular telemetry timing
 
----
 
 # Task 2 Conclusion
 
@@ -1207,7 +1164,6 @@ This allows temporary flow interruptions to be distinguished from genuine payloa
 
 The approach also avoids hard-coded timestamps and sample indices, allowing the detector to operate on different telemetry sequences using the same underlying detection logic.
 
----
 
 # Repository Contents
 
@@ -1224,20 +1180,6 @@ agri_spray_ros2/
     ├── spray_mission_bag_0.db3
     └── metadata.yaml
 ```
-
----
-
-# License
-
-Add the appropriate project license here, for example:
-
-```text
-MIT License
-```
-
-or replace this section with the license required by the assessment.
-
----
 
 # Author
 
