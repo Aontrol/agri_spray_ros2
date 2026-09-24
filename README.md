@@ -181,7 +181,6 @@ ros2 bag info spray_mission_bag
 
 The bag contains the telemetry required by the visualization and tank-empty detection system.
 
----
 
 # 4. Regenerating the ROS 2 Bag
 
@@ -207,7 +206,6 @@ The generated bag can then be inspected:
 ros2 bag info spray_mission_bag
 ```
 
----
 
 # 5. Running the System
 
@@ -224,7 +222,6 @@ python3 ros2_live_visualizer.py
 
 The node subscribes to the telemetry stream and processes the incoming messages.
 
----
 
 ## Terminal 2 — Play the ROS 2 Bag
 
@@ -514,7 +511,6 @@ IF refill/reset event detected:
 
 The detector therefore supports multiple flight/refill cycles without requiring a hard-coded mission timestamp.
 
----
 
 # 2. Adaptive Dual-State Decision
 
@@ -528,8 +524,6 @@ The detector uses the following primary thresholds.
 | Slosh probe window        |     5.0 s |
 | Empty-volume limit        |    300 mL |
 | Empty confirmation window |     2.0 s |
-
----
 
 # Motor RPM Threshold
 
@@ -547,7 +541,6 @@ Motor OFF + Flow = 0
 
 as evidence of tank exhaustion.
 
----
 
 # Low-Flow Threshold
 
