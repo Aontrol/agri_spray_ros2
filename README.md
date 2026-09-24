@@ -14,7 +14,7 @@ This project addresses a telemetry scenario where the onboard Companion Computer
 * **Native ROS 2 Bag Generation**: Converts raw 1 Hz CSV telemetry into SQLite3 ROS 2 bag files using standard ROS 2 message definitions (`PoseStamped`, `Float32`, `String`).
 * **Live Telemetry Stream Processing**: Consumes ROS 2 bag topics via `ros2 bag play` in real time.
 * **Real-Time Visualization Dashboard**: Renders local East-North-Up (ENU) trajectory maps alongside synchronized time-series telemetry plots (flow rate, motor RPM, estimated payload volume).
-* **Adaptive Mass-Balance Detector**: Integrates flow rates dynamically ($\Delta V = \text{FlowRate} \times \Delta t$) with a 5-second slosh-probe window and a 2-second empty confirmation window to prevent false RTL triggers while protecting the pump.
+* **Adaptive Mass-Balance Detector**: Integrates flow rates dynamically with a 5-second slosh-probe window and a 2-second empty confirmation window to prevent false RTL triggers while protecting the pump.
 
 ## Repository Structure
 
@@ -98,9 +98,10 @@ ros2 bag play spray_mission_bag
 
 The onboard Companion Computer (CC) evaluated an instantaneous, stateless boolean rule:
 
-$$
-\text{Pump Active (RPM > Threshold)} \land \text{Flow Rate < Threshold} \implies \text{TANK\_EMPTY} \implies \text{RTL}
-$$
+```text
+IF (Pump Active [RPM > 1200]) AND (Flow Rate < 50 mL/min):
+    DECLARE TANK_EMPTY -> COMMAND RTL
+```
 
 During pass turnarounds or banked maneuvers, centrifugal forces and liquid movement in the partially filled tank cause:
 1. Liquid displacement away from the bottom suction port.
@@ -142,7 +143,7 @@ The corrected detector implements a **dual-state machine** combining **mass-bala
                                 │
              ┌──────────────────┴──────────────────┐
              ▼                                     ▼
-      [Volume > 300 mL]                     [Volume ≤ 300 mL]
+      [Volume > 300 mL]                     [Volume <= 300 mL]
              │                                     │
              ▼                                     ▼
        PROBING_SLOSH                       PROBING_TANK_EMPTY
@@ -159,9 +160,9 @@ recovers│             │ Expired                    │ Expired
 1. **Nominal Tank Capacity (`10,000 mL`)**: Initialized at takeoff; resets upon detecting `REFILL`/`GROUND_RESET`.
 2. **Motor RPM Threshold (`1,200 RPM`)**: Ensures low-flow logic only evaluates when the pump is commanded ON.
 3. **Low-Flow Threshold (`50 mL/min`)**: Cutoff for detecting suction loss or flow blockages.
-4. **Slosh Probe Window (`5.0 s`)**: Allows temporary sloshing or line pressure lag to self-correct when estimated payload is high ($> 300\text{ mL}$).
+4. **Slosh Probe Window (`5.0 s`)**: Allows temporary sloshing or line pressure lag to self-correct when estimated payload is high (> 300 mL).
 5. **Empty Reserve Boundary (`300 mL`)**: Defines the near-empty threshold (~3% capacity).
-6. **Confirmation Window (`2.0 s`)**: Requires a low-flow condition to persist for 2 seconds when volume $\le 300\text{ mL}$ before issuing `DETECTOR_TANK_EMPTY` to save the pump from running dry.
+6. **Confirmation Window (`2.0 s`)**: Requires a low-flow condition to persist for 2 seconds when volume <= 300 mL before issuing `DETECTOR_TANK_EMPTY` to save the pump from running dry.
 
 #### Log-Wide Verdict Comparison
 
@@ -176,7 +177,7 @@ recovers│             │ Expired                    │ Expired
 
 1. **Initial Payload**: Tank is filled to nominal 10,000 mL capacity prior to flight start unless reset via status message.
 2. **Flow Sensor Calibration**: Telemetry `flow_rate_ml_min` is assumed linearly calibrated in mL/min.
-3. **Sampling Integration**: Integrates volume using dynamic step sizes ($\Delta t = t_n - t_{n-1}$) rather than assuming rigid 1.0s sample steps.
+3. **Sampling Integration**: Integrates volume using dynamic step sizes (dt = t_n - t_n-1) rather than assuming rigid 1.0s sample steps.
 4. **Coordinate Frame**: Global GNSS coordinates (Lat/Lon) are mapped to a local planar East-North-Up (ENU) frame in meters relative to the first valid GPS lock.
 
 ## Author
