@@ -51,8 +51,6 @@ agri_spray_ros2/
     └── metadata.yaml
 ```
 
----
-
 # System Data Flow
 
 ```text
