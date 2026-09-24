@@ -4,9 +4,6 @@
 
  The system consumes **1 Hz agricultural drone telemetry** through native ROS 2 bag playback, visualizes the drone trajectory and synchronized telemetry signals in real time, and implements an **adaptive mass-balance tank-empty detector** designed to prevent false Return-to-Launch (RTL) decisions caused by temporary flow interruptions during flight.
 
- **Repository:** https://github.com/Aontrol/agri\_spray\_ros2
-
----
 
  ## Project Overview
 
@@ -14,7 +11,7 @@
 
  This project addresses a telemetry scenario where the onboard **Companion Computer (CC)** incorrectly declared the spray tank empty during a temporary flow interruption, leaving more than **4.5 L (45%) of usable liquid** in the tank.
 
----
+
 
  ## Key Features
 
@@ -44,7 +41,7 @@
   - Prevents temporary flow interruptions from triggering false RTL decisions.
   - Protects the pump from prolonged operation when the tank is genuinely empty.
 
----
+
 
  ## Repository Structure
 
@@ -62,7 +59,6 @@ agri_spray_ros2/
     └── metadata.yaml
 ```
 
----
 
  # How to Build and Run
 
@@ -77,7 +73,6 @@ agri_spray_ros2/
 
 A ROS 2 `ros-base` installation is required.
 
----
 
  ## Step 1 — System Dependencies & Environment Setup
 
@@ -108,7 +103,6 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
----
 
  # Step 2 — Generate the Native ROS 2 Bag
 
@@ -128,7 +122,6 @@ ros2 bag info spray_mission_bag
 
  The generated bag uses the SQLite3 storage backend and can be replayed using the standard ROS 2 CLI.
 
----
 
  # Step 3 — Run the Visualizer and Play the Bag
 
@@ -156,7 +149,6 @@ python3 ros2_live_visualizer.py
 
  The GUI dashboard will open and wait for the live ROS 2 telemetry stream.
 
----
 
  ## Terminal 2 — Play the ROS 2 Bag
 
@@ -174,7 +166,6 @@ ros2 bag play spray_mission_bag
 
  The telemetry will be replayed in real time at the original **1 Hz sampling rate** and processed live by the ROS 2 node.
 
----
 
  # Task 2 — Spurious Tank-Empty Detection Analysis
 
@@ -208,7 +199,6 @@ $$
 
  This resulted in an unnecessary RTL command even though a substantial quantity of liquid remained in the tank.
 
----
 
  # Point 2 — Supporting Telemetry Samples from the Log
 
@@ -238,7 +228,6 @@ $$
 
  Therefore, the instantaneous low-flow condition did not represent genuine tank depletion.
 
----
 
  # Point 3 — Corrected Detector Design & Log-Wide Evaluation
 
@@ -287,7 +276,6 @@ $$
                     LINE_ISSUE
 ```
 
----
 
  # Thresholds & Time Constants
 
@@ -300,7 +288,6 @@ $$
 | Empty Reserve Boundary | 300 mL | Near-empty threshold (\~3% capacity) |
 | Empty Confirmation Window | 2.0 s | Confirms persistent low flow before tank-empty declaration |
 
----
 
  ## Mass-Balance Volume Estimation
 
@@ -338,7 +325,6 @@ $$
 
  This makes the detector robust to small variations in telemetry timing.
 
----
 
  # Detector Logic
 
@@ -360,7 +346,6 @@ DETECTOR_NOMINAL_OK
 
  The estimated payload volume continues to be updated through mass-balance integration.
 
----
 
  ## 2\. Slosh Probe
 
@@ -402,7 +387,6 @@ FAULT_CLOG_OR_LINE_ISSUE
 
  rather than immediately declaring the tank empty.
 
----
 
  ## 3\. Tank-Empty Confirmation
 
@@ -432,7 +416,6 @@ DETECTOR_TANK_EMPTY
 
  This reduces the risk of pump dry-running while avoiding an instantaneous empty declaration.
 
----
 
  # Log-Wide Verdict Comparison
 
@@ -443,7 +426,6 @@ DETECTOR_TANK_EMPTY
 | Mission Resume | 11:22:16 – 11:38:39 | 4.51 L → 0.30 L | `NOMINAL` | `DETECTOR_NOMINAL_OK` | Continuous spraying and payload tracking |
 | Genuine Depletion | 11:38:40 – 11:38:43 | \<0.30 L | `TANK_EMPTY` | `DETECTOR_TANK_EMPTY` | Genuine empty condition confirmed after 2 s |
 
----
 
  # System Assumptions
 
@@ -459,7 +441,6 @@ DETECTOR_TANK_EMPTY
 
  The payload estimate can be reset when a suitable `REFILL` or `GROUND_RESET` status message is detected.
 
----
 
  ## Flow Sensor Calibration
 
@@ -475,7 +456,6 @@ flow_rate_ml_min
 mL/min
 ```
 
----
 
  ## Sampling Integration
 
@@ -487,7 +467,6 @@ $$
 
  rather than assuming a rigid 1.0-second sample interval.
 
----
 
  ## Coordinate Frame
 
@@ -515,7 +494,6 @@ $$
 
  This allows the dashboard to display the drone trajectory in meters rather than raw latitude/longitude coordinates.
 
----
 
  # Architecture
 
@@ -562,7 +540,6 @@ $$
                        Live Visualization
 ```
 
----
 
  # Why the Adaptive Detector Matters
 
@@ -589,7 +566,6 @@ $$
 
  When significant payload remains, the detector allows additional time for the flow to recover. When the tank is genuinely near empty, the detector uses a shorter confirmation period to protect the pump.
 
----
 
  # Results
 
@@ -613,7 +589,6 @@ DETECTOR_TANK_EMPTY
 
  This provides a stateful and mass-balance-aware alternative to the original instantaneous tank-empty rule.
 
----
 
  # Technologies Used
 
@@ -629,7 +604,6 @@ DETECTOR_TANK_EMPTY
 - **Finite-state detection logic**
 - **Mass-balance payload estimation**
 
----
 
  # Running the Project
 
@@ -658,8 +632,6 @@ source /opt/ros/lyrical/setup.bash
 
 ros2 bag play spray_mission_bag
 ```
-
----
 
  # Author
 
