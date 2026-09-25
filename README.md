@@ -36,6 +36,7 @@ agri_spray_ros2/
 
 ### Prerequisites
 * **OS**: Ubuntu 22.04 LTS / 24.04 LTS / 26.04 LTS
+* https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debs.html
 * **ROS 2**: Humble, Iron, Jazzy, or Lyrical (`ros-*-ros-base` installed)
 * **Python**: 3.10+ with `python3-tk` installed
 
