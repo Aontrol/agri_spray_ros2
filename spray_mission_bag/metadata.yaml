@@ -1,0 +1,62 @@
+rosbag2_bagfile_information:
+  version: 9
+  storage_identifier: sqlite3
+  duration:
+    nanoseconds: 299000000000
+  starting_time:
+    nanoseconds_since_epoch: 1700000000000000000
+  message_count: 1500
+  topics_with_message_count:
+    - topic_metadata:
+        name: /spray_system/cc_status
+        type: std_msgs/msg/String
+        serialization_format: cdr
+        offered_qos_profiles:
+          []
+        type_description_hash: ""
+      message_count: 300
+    - topic_metadata:
+        name: /spray_system/time_ist
+        type: std_msgs/msg/String
+        serialization_format: cdr
+        offered_qos_profiles:
+          []
+        type_description_hash: ""
+      message_count: 300
+    - topic_metadata:
+        name: /spray_system/motor_rpm
+        type: std_msgs/msg/Float32
+        serialization_format: cdr
+        offered_qos_profiles:
+          []
+        type_description_hash: ""
+      message_count: 300
+    - topic_metadata:
+        name: /spray_system/flow_rate
+        type: std_msgs/msg/Float32
+        serialization_format: cdr
+        offered_qos_profiles:
+          []
+        type_description_hash: ""
+      message_count: 300
+    - topic_metadata:
+        name: /drone/telemetry
+        type: geometry_msgs/msg/PoseStamped
+        serialization_format: cdr
+        offered_qos_profiles:
+          []
+        type_description_hash: ""
+      message_count: 300
+  compression_format: ""
+  compression_mode: ""
+  relative_file_paths:
+    - 0_spray_mission_bag_2026_09_24-15_51_25.db3
+  files:
+    - path: 0_spray_mission_bag_2026_09_24-15_51_25.db3
+      starting_time:
+        nanoseconds_since_epoch: 1700000000000000000
+      duration:
+        nanoseconds: 299000000000
+      message_count: 1500
+  custom_data: ~
+  ros_distro: lyrical
