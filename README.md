@@ -65,7 +65,7 @@ agri_spray_ros2/
 
 Run the generator script to convert the telemetry CSV into a native ROS 2 bag:
 ```bash
-python3 generate_ros2_bag.py spray_mission_assessment.csv spray_mission_bag
+python3 main_ros2_writer.py spray_mission_assessment.csv spray_mission_bag
 ```
 
 Inspect the generated bag metadata:
