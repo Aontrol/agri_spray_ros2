@@ -50,6 +50,7 @@ agri_spray_ros2/
 
 2. **Create a Python virtual environment with system site-packages**:
    ```bash
+   sudo apt install python3.12-venv
    python3 -m venv ros2_env --system-site-packages
    source ros2_env/bin/activate
    ```
